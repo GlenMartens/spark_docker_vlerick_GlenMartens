@@ -23,8 +23,8 @@ config= {
 }
 
 # Read the files
-before = spark.s3.read_csv(f"s3a://{BUCKET}/{KEY_PRE}", header=True).toPandas()
-after = spark.s3.read_csv(f"s3a://{BUCKET}/{KEY_AFTER}", header=True).toPandas()
+before = spark.read.csv(f"s3a://{BUCKET}/{KEY_PRE}", header=True).toPandas()
+after = spark.read.csv(f"s3a://{BUCKET}/{KEY_AFTER}", header=True).toPandas()
 
 # before = pd.read_csv('/repo/data/pre_release.csv')
 # after = pd.read_csv('/repo/data/after_release.csv')
@@ -244,4 +244,4 @@ real_prediction = scalerY.inverse_transform([prediction]).flatten()
 
 spark_df = spark.createDataFrame(preal_prediction)
 
-wr.s3.to_csv(real_prediction, path="s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.csv")
+spark.write.csv(real_prediction, path="s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.csv")
