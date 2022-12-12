@@ -11,7 +11,7 @@ RUN apt-get update && \
 
 #ENV JAVA_HOME /repo/java-11-openjdk/
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
-RUN echo $JAVA_HOME
+
 
 RUN useradd -ms /bin/bash python-api
 USER python-api

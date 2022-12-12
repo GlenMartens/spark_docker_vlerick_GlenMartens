@@ -11,12 +11,14 @@ from pyspark import SparkConf
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split
 
 
 
 # Spark setup
 config= {
-    "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1"
+    "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
+    "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
 }
 conf = SparkConf().setAll(config.items())
 spark = SparkSession.builder.config(conf=conf).getOrCreate()
@@ -25,6 +27,7 @@ spark = SparkSession.builder.getOrCreate()
 BUCKET="dmacademy-course-assets"
 KEY_PRE="vlerick/pre_release.csv"
 KEY_AFTER="vlerick/after_release.csv"
+KEY_RESULT=""
 
 
 
@@ -226,9 +229,9 @@ if scaling:
 
 # Define the X and y variables
 y = df[to_predict]
-df.drop(to_predict, axis=1, inplace=True)
+#df.drop(to_predict, axis=1, inplace=True)
 X = df.copy()
-
+X_train, X_test, y_train, y_test = train_test_split(df, df[to_predict], test_size=0.2)
 # First we will start with simple linear regression from sklearn, using KFold validtion
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import KFold
@@ -236,15 +239,12 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_absolute_error 
 
 
+
 # The best model I found in the project
 model = RandomForestRegressor(n_estimators=160, criterion="squared_error", max_depth=5)
-model.fit(X, y) # Use the whole dataset to prepare for training
+model.fit(X_train, y_train) # Use the whole dataset to prepare for training
 
-
-
-# The model can now be used to predict imdb scores given the features by using
-feature_values = [] # Fill this in with the values
-prediction = model.predict(X)
+prediction = model.predict(X_test)
 real_prediction = scalerY.inverse_transform([prediction]).flatten()
 #print("We predict this movie will have an imdb score of ", real_prediction)
 
@@ -252,4 +252,8 @@ real_prediction = pd.DataFrame(real_prediction, columns=["y_pred"])
 
 spark_df = spark.createDataFrame(real_prediction)
 
-spark_df.write.csv("s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.csv")
+#spark_df.write.format('json').json("s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.json")
+spark_df.write.option("header",True).mode("Overwrite").json("s3a://dmacademy-course-assets/vlerick/Glen/predictions.json")
+#spark_df.write.option("header",True).mode(SaveMode.Overwrite).json("s3a://dmacademy-course-assets/vlerick/Glen/predictions.json")
+#spark_df.write.option("header",True).json(f"s3a://{BUCKET}/{KEY_PRE}")
+print("done")
