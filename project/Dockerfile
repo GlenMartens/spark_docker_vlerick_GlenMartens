@@ -1,10 +1,12 @@
 # Use an official Python runtime as a parent image
-FROM gitpod/workspace-python-3.8:2022-12-02-22-15-49
+FROM python:3.9.13
 
 USER root
-
+# Install apt packages and clean up cached files
 RUN apt-get update && \
-    apt-get install -y openjdk-8-jdk python3-venv
+    apt-get install -y openjdk-11-jdk python3-venv && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN useradd -ms /bin/bash my_user
 USER my_user
