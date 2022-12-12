@@ -7,21 +7,26 @@ import pandas as pd
 import numpy as np
 from pyspark.sql import SparkSession
 from pyspark.sql.dataframe import DataFrame
+from pyspark import SparkConf
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestRegressor
 
+
+
 # Spark setup
+config= {
+    "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1"
+}
+conf = SparkConf().setAll(config.items())
+spark = SparkSession.builder.config(conf=conf).getOrCreate()
 spark = SparkSession.builder.getOrCreate()
 
 BUCKET="dmacademy-course-assets"
 KEY_PRE="vlerick/pre_release.csv"
 KEY_AFTER="vlerick/after_release.csv"
 
-config= {
-    "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
-    "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.InstanceProfileCredentialsProvider"
-}
+
 
 # Read the files
 before = spark.read.csv(f"s3a://{BUCKET}/{KEY_PRE}", header=True).toPandas()
@@ -243,6 +248,8 @@ prediction = model.predict(X)
 real_prediction = scalerY.inverse_transform([prediction]).flatten()
 #print("We predict this movie will have an imdb score of ", real_prediction)
 
-spark_df = spark.createDataFrame(preal_prediction)
+real_prediction = pd.DataFrame(real_prediction, columns=["y_pred"])
 
-spark.write.csv(real_prediction, path="s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.csv")
+spark_df = spark.createDataFrame(real_prediction)
+
+spark_df.write.csv("s3://dmacademy-course-assets/vlerick/GlenMartens/predictions.csv")
