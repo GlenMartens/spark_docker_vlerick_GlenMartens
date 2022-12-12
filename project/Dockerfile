@@ -20,6 +20,7 @@ RUN python -m pip install -r /repo/requirements.txt
 
 # Make port 8080 available to the world outside this container
 EXPOSE 8080
+EXPOSE 4040
 
 ENTRYPOINT ["python"]
 
