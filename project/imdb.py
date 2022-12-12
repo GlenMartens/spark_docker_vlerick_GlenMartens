@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestRegressor
 
 # Spark setup
-spark = SparkSession.builder().getOrCreate()
+spark = SparkSession.builder.getOrCreate()
 
 BUCKET="dmacademy-course-assets"
 KEY_PRE="vlerick/pre_release.csv"
