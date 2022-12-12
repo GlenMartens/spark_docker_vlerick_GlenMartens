@@ -6,6 +6,7 @@
 import pandas as pd
 import numpy as np
 from pyspark.sql import SparkSession
+from pyspark.sql.dataframe import DataFrame
 from sklearn.datasets import make_blobs
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.ensemble import RandomForestRegressor
@@ -19,7 +20,7 @@ KEY_AFTER="vlerick/after_release.csv"
 
 config= {
     "spark.jars.packages": "org.apache.hadoop:hadoop-aws:3.3.1",
-    "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+    "spark.hadoop.fs.s3a.aws.credentials.provider": "org.apache.hadoop.fs.s3a.InstanceProfileCredentialsProvider"
 }
 
 # Read the files
