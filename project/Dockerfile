@@ -11,7 +11,13 @@ RUN apt-get update && \
 
 #ENV JAVA_HOME /repo/java-11-openjdk/
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ARG AWS_ACCESS_KEY_ID
+ARG AWS_SECRET_ACCESS_KEY
+ENV AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+ENV AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
 
+RUN echo ${AWS_ACCESS_KEY_ID}
+RUN echo ${AWS_SECRET_ACCESS_KEY}
 
 RUN useradd -ms /bin/bash python-api
 USER python-api
